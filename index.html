@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fabi's Hobby Passport</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F1F3EC">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='none' stroke='%232944C4' stroke-width='5'/%3E%3Cpath d='M20 33l8 8 16-18' fill='none' stroke='%232944C4' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: one narrow column like a passport booklet. Stamp grid up top, what he likes, then Up next / Still to try / Tried. */
+  --paper:#F1F3EC;
+  --card:#FFFFFF;
+  --ink:#1B2130;
+  --muted:#5C6574;
+  --line:#D8DDD1;
+  --accent:#2944C4;
+  --accent-soft:#E2E7FA;
+  --on-accent:#FFFFFF;
+  --star:#E0A116;
+  --warn:#9A5600;
+  --creative:#7A4ED3; --creative-soft:#EEE7FB;
+  --sport:#0C8276;    --sport-soft:#DCF1EE;
+  --food:#C2611A;     --food-soft:#FAE9DA;
+  --adventure:#BF3838;--adventure-soft:#F8E0E0;
+  --leisure:#B23A82;  --leisure-soft:#F7E0EE;
+  --font-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --font-body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11151C; --card:#1A1F2A; --ink:#E7EAF0; --muted:#9AA3B2; --line:#2B3343;
+    --accent:#8FA3FF; --accent-soft:#232B49; --on-accent:#0E1220; --star:#F2C14E; --warn:#F0B35A;
+    --creative:#BBA2F6; --creative-soft:#2A2340;
+    --sport:#55C9BA;    --sport-soft:#15302D;
+    --food:#F0A262;     --food-soft:#33261A;
+    --adventure:#F28C8C;--adventure-soft:#3A2023;
+    --leisure:#EE8EC6;  --leisure-soft:#38212F;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11151C; --card:#1A1F2A; --ink:#E7EAF0; --muted:#9AA3B2; --line:#2B3343;
+  --accent:#8FA3FF; --accent-soft:#232B49; --on-accent:#0E1220; --star:#F2C14E; --warn:#F0B35A;
+  --creative:#BBA2F6; --creative-soft:#2A2340;
+  --sport:#55C9BA;    --sport-soft:#15302D;
+  --food:#F0A262;     --food-soft:#33261A;
+  --adventure:#F28C8C;--adventure-soft:#3A2023;
+  --leisure:#EE8EC6;  --leisure-soft:#38212F;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 72px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* Hero */
+.hero{display:flex;flex-direction:column;gap:14px}
+.owner{font:700 15px/1 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.hero h1{font-size:clamp(44px,12vw,72px);font-weight:800;line-height:.92;letter-spacing:-.025em}
+.lede{color:var(--muted);max-width:52ch}
+.tally{display:flex;align-items:baseline;gap:10px;font-variant-numeric:tabular-nums}
+.tally .big{font:800 44px/1 var(--font-display);letter-spacing:-.02em}
+.tally .of{color:var(--muted);font-weight:500}
+.stampgrid{display:flex;flex-wrap:wrap;gap:7px}
+.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);background:transparent}
+.dot.is-next{border-color:var(--accent);border-style:dashed}
+.dot.is-done{border-color:transparent}
+.dot.t-Creative.is-done{background:var(--creative)}
+.dot.t-Sport.is-done{background:var(--sport)}
+.dot.t-Food.is-done{background:var(--food)}
+.dot.t-Adventure.is-done{background:var(--adventure)}
+.dot.t-Leisure.is-done{background:var(--leisure)}
+.sync{font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}
+.sync.ok::before{background:var(--sport)}
+.sync.warn{color:var(--warn)}
+.sync.warn::before{background:var(--warn)}
+
+/* What he likes */
+.likes{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.likes h2{font-size:21px;font-weight:700}
+.fav{font-size:15px}
+.fav strong{font-weight:700}
+.typerows{display:flex;flex-direction:column;gap:10px}
+.typerow{display:grid;grid-template-columns:92px 1fr 92px;align-items:center;gap:10px;font-size:14px;font-variant-numeric:tabular-nums}
+.typerow .name{font-weight:600}
+.track{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.fill{height:100%;border-radius:4px}
+.typerow .stat{color:var(--muted);text-align:right;white-space:nowrap}
+.toprated{display:flex;flex-direction:column;gap:6px;font-size:14px;border-top:1px solid var(--line);padding-top:12px}
+.toprated .label{color:var(--muted);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.toprated li{display:flex;justify-content:space-between;gap:12px}
+.toprated ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.toprated .s{color:var(--star);white-space:nowrap;letter-spacing:1px}
+.hint{color:var(--muted);font-size:14px}
+
+/* Filters */
+.filters{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:thin}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.chip .n{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip[aria-pressed="true"] .n{color:inherit;opacity:.75}
+
+/* Sections and cards */
+.sec{display:flex;flex-direction:column;gap:12px}
+.sec-head{display:flex;align-items:baseline;gap:10px}
+.sec-head h2{font-size:24px;font-weight:700;letter-spacing:-.01em}
+.sec-head .count{color:var(--muted);font-variant-numeric:tabular-nums;font-size:15px}
+.list{display:flex;flex-direction:column;gap:10px}
+
+.card{--tc:var(--muted);--tcs:var(--line);display:grid;grid-template-columns:auto 1fr;gap:12px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--tc);border-radius:10px;padding:14px 14px 14px 12px}
+.card.has-stamp{grid-template-columns:auto 1fr auto}
+.card.t-Creative{--tc:var(--creative);--tcs:var(--creative-soft)}
+.card.t-Sport{--tc:var(--sport);--tcs:var(--sport-soft)}
+.card.t-Food{--tc:var(--food);--tcs:var(--food-soft)}
+.card.t-Adventure{--tc:var(--adventure);--tcs:var(--adventure-soft)}
+.card.t-Leisure{--tc:var(--leisure);--tcs:var(--leisure-soft)}
+.card.is-next{border-color:var(--accent);border-left-color:var(--tc);box-shadow:0 0 0 1px var(--accent) inset}
+
+.tick{appearance:none;-webkit-appearance:none;margin:2px 0 0;width:28px;height:28px;border:2px solid var(--muted);border-radius:8px;background:var(--card);cursor:pointer;display:grid;place-content:center;flex:none}
+.tick::before{content:"";width:12px;height:7px;border-left:3px solid var(--on-accent);border-bottom:3px solid var(--on-accent);transform:translateY(-2px) rotate(-45deg) scale(0);transition:transform .15s ease}
+.tick:checked{background:var(--accent);border-color:var(--accent)}
+.tick:checked::before{transform:translateY(-2px) rotate(-45deg) scale(1)}
+.tick:disabled{cursor:not-allowed;opacity:.55}
+
+.body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:12.5px}
+.pill{background:var(--tcs);color:var(--tc);font-weight:700;border-radius:999px;padding:2px 9px;letter-spacing:.02em}
+.area{color:var(--muted);font-weight:600}
+.when{color:var(--ink);font-weight:600;background:var(--accent-soft);border-radius:6px;padding:2px 7px}
+.when.passed{background:transparent;color:var(--warn);padding:0}
+.card h3{font-size:18px;font-weight:700;line-height:1.25}
+.where{font-size:14.5px;overflow-wrap:anywhere}
+.note{font-size:14px;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.btn{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn:disabled{cursor:not-allowed;opacity:.55}
+
+.review{display:flex;flex-direction:column;gap:10px;margin-top:6px;padding-top:10px;border-top:1px dashed var(--line)}
+.stars{border:0;margin:0;padding:0;display:flex;align-items:center;gap:2px}
+.stars legend{font-size:13px;font-weight:600;color:var(--muted);margin-right:10px;float:left;white-space:nowrap;padding:0}
+.stars input{position:absolute;opacity:0;width:1px;height:1px}
+.stars label{font-size:28px;line-height:1;color:var(--line);cursor:pointer;padding:0 2px;user-select:none}
+.stars label.on{color:var(--star)}
+.stars input:focus-visible + label{outline:3px solid var(--accent);outline-offset:1px;border-radius:4px}
+.stars input:disabled + label{cursor:not-allowed}
+.fields{display:flex;flex-wrap:wrap;gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+.field.grow{flex:1 1 220px}
+.field input{border:1.5px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 10px;font-size:15px;font-weight:500;color:var(--ink);min-width:0}
+.field input:focus{border-color:var(--accent);outline:none}
+.field input:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+
+.stamp{width:66px;height:66px;border-radius:50%;border:2.5px solid var(--accent);color:var(--accent);display:grid;place-items:center;text-align:center;font:800 11px/1.15 var(--font-display);letter-spacing:.08em;text-transform:uppercase;transform:rotate(-12deg);align-self:start;position:relative}
+.stamp::after{content:"";position:absolute;inset:4px;border:1px dashed var(--accent);border-radius:50%;opacity:.7}
+.stamp.stamp-in{animation:thunk .5s cubic-bezier(.2,1.5,.4,1)}
+@keyframes thunk{from{transform:scale(1.9) rotate(-32deg);opacity:0}to{transform:scale(1) rotate(-12deg);opacity:1}}
+@media (prefers-reduced-motion: reduce){.stamp.stamp-in{animation:none}.tick::before{transition:none}}
+
+.empty{font-size:14.5px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:14px}
+footer{font-size:13px;color:var(--muted)}
+
+@media (max-width:420px){
+  .typerow{grid-template-columns:80px 1fr 84px;gap:8px}
+  .stamp{width:56px;height:56px;font-size:9.5px}
+  .card{padding:12px 12px 12px 10px;gap:10px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <p class="owner">Fabi's</p>
+    <h1>Hobby Passport</h1>
+    <p class="lede">One new thing at a time. Tick off each activity once he's tried it, give it stars, and see what he enjoys most.</p>
+    <div class="tally"><span id="tally-num" class="big">0</span><span class="of">of <span id="tally-total">0</span> tried</span></div>
+    <div id="stampgrid" class="stampgrid" role="img" aria-label="Activities tried"></div>
+    <p id="sync" class="sync" role="status">Loading saved progress…</p>
+  </header>
+
+  <section class="likes" aria-labelledby="likes-h">
+    <h2 id="likes-h">What he likes so far</h2>
+    <div id="likes-body"></div>
+  </section>
+
+  <nav id="filters" class="filters" aria-label="Filter by type"></nav>
+
+  <section class="sec" id="sec-next" aria-labelledby="h-next">
+    <div class="sec-head"><h2 id="h-next">Up next</h2><span class="count" id="c-next"></span></div>
+    <div class="list" id="list-next"></div>
+  </section>
+
+  <section class="sec" id="sec-todo" aria-labelledby="h-todo">
+    <div class="sec-head"><h2 id="h-todo">Still to try</h2><span class="count" id="c-todo"></span></div>
+    <div class="list" id="list-todo"></div>
+  </section>
+
+  <section class="sec" id="sec-done" aria-labelledby="h-done">
+    <div class="sec-head"><h2 id="h-done">Tried</h2><span class="count" id="c-done"></span></div>
+    <div class="list" id="list-done"></div>
+  </section>
+
+  <footer>Places, prices and class dates were checked in November 2026. Confirm with the venue before booking.</footer>
+</main>
+
+<script>
+const ACTIVITIES = [
+  {id:"hand-clay", title:"Hand clay creation", where:"Genars Art", area:"", type:"Creative", note:"His first one!"},
+  {id:"abc-cooking", title:"Cooking class", where:"ABC Cooking Studio", area:"", type:"Food", note:""},
+  {id:"pilates", title:"Pilates (beginner class)", where:"Pilates Culture – Cikarang Groove 3rd Fl, Jl. MH Thamrin 117, Lippo Cikarang", area:"Cikarang", type:"Sport", note:"Beginner-friendly classes; from about Rp149k per visit."},
+  {id:"padel", title:"Padel", where:"Ganda Agung Sports Padel – Karangbahagia, Cikarang Utara", area:"Cikarang", type:"Sport", note:"Court rental around Rp200k; bring 2–3 friends to make a match."},
+  {id:"archery", title:"Archery", where:"D'Khayangan Archery Center – Jababeka", area:"Cikarang", type:"Sport", note:"Hosts national team selections, so call ahead to ask about a beginner session."},
+  {id:"ice-skating", title:"Ice skating", where:"Oasis Centre Arena – AEON Mall Jakarta Garden City, Cakung", area:"East Jakarta", type:"Sport", note:"Olympic-size rink with lessons; the closest rink to Cikarang. Weekdays are quieter."},
+  {id:"horse-riding", title:"Horse riding lesson", where:"Equinara Horse Sports – Jakarta International Equestrian Park, Pulomas", area:"East Jakarta", type:"Sport", note:"Riding academy with programs for all levels, beginners included."},
+  {id:"perfume", title:"Perfume making", where:"Naami Scents Academy – Taman Semanan Indah", area:"West Jakarta", type:"Creative", note:"Blend your own scent and take the bottle home; alcohol-free option available."},
+  {id:"candle", title:"Candle making", where:"KLEI Studio Academy (IG @klei.studioo)", area:"Jakarta", type:"Creative", note:"Also runs reed diffuser and room spray classes."},
+  {id:"batik", title:"Batik workshop", where:"Rumah Batik Palbatu – Tebet", area:"South Jakarta", type:"Creative", note:"Try traditional hand-drawn batik."},
+  {id:"pottery-tanakita", title:"Pottery on the wheel", where:"Tanakita Ceramics – Barnyard Kemang (or Tanjung Duren, West Jakarta)", area:"South Jakarta", type:"Creative", note:"The next level after hand clay."},
+  {id:"paint-sip", title:"Paint & sip", where:"Bartega Studio – Lotte Shopping Avenue, Kuningan", area:"South Jakarta", type:"Creative", note:"Guided acrylic painting, more party than class; no experience needed."},
+  {id:"flowers", title:"Flower arranging", where:"Baleton Flowerchef (book on Klook)", area:"Jakarta", type:"Creative", note:"Up to about 3 hours; take your arrangement home."},
+  {id:"bouldering", title:"Bouldering", where:"Indoclimb – FX Sudirman (also Lippo Mall Kemang)", area:"Central Jakarta", type:"Sport", note:"No ropes or harness, just climbing shoes; fun to do together."},
+  {id:"aerial", title:"Aerial / bungee fitness", where:"Kaloria Studio (female only) – Jl. Margaguna II, Gandaria", area:"South Jakarta", type:"Sport", note:"Start with the Bungee Fly Beginner class."},
+  {id:"paragliding", title:"Tandem paragliding", where:"Papatong Club – Bukit Gantole, Cisarua", area:"Puncak, Bogor", type:"Adventure", note:"Fly with an instructor; open 08:00–17:00, go early for the best weather."},
+  {id:"rafting", title:"River rafting", where:"Nagare Rafting or Gelora Rafting – Cisadane River, Caringin", area:"Bogor", type:"Adventure", note:"Nagare packages about Rp195–250k; best in the dry season."},
+  {id:"silver-ring", title:"Silver ring making", where:"Silver workshops in Kotagede", area:"Yogyakarta", type:"Creative", note:"Weekend-trip idea: make your own jewelry from raw silver with local artisans."},
+  {id:"car-free-day", title:"Car Free Day (walk / jog)", where:"Jakarta CFD on Sudirman–Thamrin (Bundaran HI to Senayan), or Cikarang CFD along Jl. Cikarang Baru to Stadion Wibawa Mukti", area:"Central Jakarta / Cikarang", type:"Sport", note:"Sunday mornings. Sudirman–Thamrin runs 05:30–10:00; it's cancelled on some race weekends, so check first."},
+  {id:"hyrox", title:"Hyrox training (via ClassPass)", where:"BodyFit Jakarta – Jl. Kemang Raya No.70, or BUNKR – Jl. Pintu Satu Senayan (HYROX LITE)", area:"South / Central Jakarta", type:"Sport", note:"Book both on ClassPass (new members get a 14-day free trial). HYROX LITE at BUNKR is a good first class."},
+  {id:"tufting", title:"Tufting (make your own rug)", where:"Life Is Tuft (LIT House) – Jl. Niaga Hijau II No.15, Pondok Pinang, Kebayoran Lama", area:"South Jakarta", type:"Creative", note:"Daily 2-hour classes from about Rp349k; Rug Labs by Moire Rugs in Kebayoran Baru is another option."},
+  {id:"sea-fishing", title:"Sea fishing (open trip)", where:"Universe Fishing – boats leave from Dermaga Kresek, Tanjung Priok", area:"North Jakarta", type:"Adventure", note:"About Rp265k per person; 05:30–14:00 with boat, bait, gear, life jacket and lunch included. Bring sunscreen and a hat."},
+  {id:"golf", title:"Golf (driving range, then a lesson)", where:"JGolf Driving Range – Kota Deltamas Sport Center (or Jababeka Golf & Country Club)", area:"Cikarang", type:"Sport", note:"JGolf has 41 bays over two floors; Jababeka has a teaching pro for lessons."},
+  {id:"karaoke", title:"Karaoke", where:"Inul Vizta family karaoke – Mega Bekasi Hypermall or Grand Galaxy Park", area:"Bekasi", type:"Leisure", note:"Private rooms for your group; Happy Puppy is a budget-friendly alternative. Confirm the branch is open before going."},
+  {id:"bk-matcha", title:"Baking: Matcha mochi burnt cheesecake", where:"Berkisah Space @ Work Unusual, Lebak Bulus", area:"South Jakarta", type:"Food", note:"Rp235k per person. Recipe, tools, drink and freebies included.", when:"2026-11-22", time:"14:00–17:00"},
+  {id:"bk-tiramisu", title:"Baking: Banana tiramisu", where:"Berkisah Space @ Kinko Cafe, Meruya", area:"West Jakarta", type:"Food", note:"Rp280k per person. Includes a Rp50k Kinko Cafe voucher.", when:"2026-12-06", time:"10:00–13:00"},
+  {id:"bk-banoffee", title:"Baking: Chocolate banoffee pie", where:"Berkisah Space @ Kinko Cafe, Meruya", area:"West Jakarta", type:"Food", note:"Rp255k per person. Same day and venue as the banana tiramisu.", when:"2026-12-06", time:"14:00–17:00"},
+  {id:"bk-cheesetart", title:"Baking: Melting cheese tart", where:"Berkisah Space @ Merame Cafe, Radio Dalam", area:"South Jakarta", type:"Food", note:"Rp270k per person.", when:"2026-12-13", time:"09:00–12:30"},
+  {id:"bk-quiche", title:"Baking: Beef spinach mushroom quiche", where:"Berkisah Space @ Merame Cafe, Radio Dalam", area:"South Jakarta", type:"Food", note:"Rp265k per person. Same day and venue as the cheese tart.", when:"2026-12-13", time:"13:30–17:00"},
+  {id:"bk-saltbread", title:"Baking: Classic saltbread", where:"Berkisah Space (IG @berkisahspace_jkt)", area:"Jakarta", type:"Food", note:"No date yet; check the JADWAL highlight on their Instagram. Also watch for their Dubai cake and cheesecake classes."},
+  {id:"ganara-wheel", title:"Pottery wheel: vase making", where:"Ganara Art Space – Ashta District 8 (Senopati), Plaza Indonesia, Hublife (West Jakarta) or Grand Outlet Karawang", area:"Jakarta / Karawang", type:"Creative", note:"The next step after hand clay. Book at ganara.art and check current prices. Karawang is the closest branch to Cikarang."},
+  {id:"ganara-fabric", title:"Painting on fabric (tote bag / bucket hat)", where:"Ganara Art Space (any branch)", area:"Jakarta / Karawang", type:"Creative", note:"Paint something he can wear; pairs well with the wheel class on the same visit."},
+  {id:"ganara-pottery-paint", title:"Painting or carving on pottery", where:"Ganara Art Space (any branch)", area:"Jakarta / Karawang", type:"Creative", note:"Decorate a ready-made piece or carve patterns into clay; canvas painting is on the menu too."}
+];
+const TYPES = ["Creative","Sport","Food","Adventure","Leisure"];
+const BY_ID = Object.fromEntries(ACTIVITIES.map(a => [a.id, a]));
+
+let progress = {};        // id -> {status, rating, note, doneOn}
+let filter = "All";
+let ready = false;        // database reached; controls enabled
+let justStamped = null;
+let renderPending = false;
+
+const writing = {}, dirty = {};
+const noteTimers = {};
+
+function pad(n){ return String(n).padStart(2, "0"); }
+function todayISO(){ const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
+function parseISO(iso){ const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d); }
+function fmtWhen(iso){ return parseISO(iso).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}); }
+function fmtStamp(iso){ return parseISO(iso).toLocaleDateString("en-GB", {day:"numeric", month:"short"}).toUpperCase(); }
+
+function state(id){
+  const p = progress[id];
+  return p ? p : {status:"todo", rating:0, note:"", doneOn:""};
+}
+function clean(raw){
+  const r = raw || {};
+  const status = ["todo","next","done"].includes(r.status) ? r.status : "todo";
+  let rating = Number(r.rating); rating = Number.isFinite(rating) ? Math.max(0, Math.min(5, Math.round(rating))) : 0;
+  const note = typeof r.note === "string" ? r.note.slice(0, 200) : "";
+  const doneOn = typeof r.doneOn === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.doneOn) ? r.doneOn : "";
+  return {status, rating, note, doneOn};
+}
+
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, "");
+    else n.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid !== null && kid !== undefined && kid !== false) n.append(kid);
+  return n;
+}
+
+/* ---------- Saving (Supabase) ---------- */
+const SUPABASE_URL = "https://rttowrsitjaaocxukglx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3Y0feXbYEejC3qy63bS0qg_gfc_tDtr";
+const API = SUPABASE_URL.replace(/\/+$/, "") + "/rest/v1/progress";
+const HEADERS = {apikey: SUPABASE_KEY};
+
+const SYNC_TEXT = {
+  loading: "Loading saved progress…",
+  ok: "Changes save automatically, and you'll both see the same progress.",
+  saving: "Saving…",
+  slow: "Can't reach saved progress right now. Check your connection; it will try again.",
+  nodb: "This site isn't connected to its database yet.",
+  error: "Couldn't save that change. Check your connection and try again."
+};
+function setSync(key){
+  const s = document.getElementById("sync");
+  s.textContent = SYNC_TEXT[key];
+  s.className = "sync" + ((key === "ok") ? " ok" : (["slow","nodb","error"].includes(key) ? " warn" : ""));
+}
+
+function save(id, patch, quiet){
+  progress[id] = {...state(id), ...patch};
+  if (!quiet) render();
+  flush(id);
+}
+async function upsert(id){
+  const s = clean(state(id));
+  const res = await fetch(API + "?on_conflict=id", {
+    method: "POST",
+    headers: {...HEADERS, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal"},
+    body: JSON.stringify({id, status: s.status, rating: s.rating, note: s.note, done_on: s.doneOn || null, updated_at: new Date().toISOString()})
+  });
+  if (!res.ok) throw new Error("Save failed: " + res.status);
+}
+async function flush(id){
+  if (!ready) return;
+  if (writing[id]) { dirty[id] = true; return; }
+  writing[id] = true;
+  setSync("saving");
+  let failed = false;
+  do {
+    dirty[id] = false;
+    try {
+      await upsert(id);
+    } catch (e) {
+      await new Promise(r => setTimeout(r, 800 + Math.random() * 900));
+      try { await upsert(id); } catch (e2) { failed = true; setSync("error"); }
+    }
+  } while (dirty[id] && !failed);
+  writing[id] = false;
+  if (!failed && !Object.values(writing).some(Boolean)) setSync("ok");
+}
+
+/* ---------- Rendering ---------- */
+function scheduleRender(){
+  const a = document.activeElement;
+  if (a && a.matches && a.matches('input[type="text"]') && a.closest(".list")) { renderPending = true; return; }
+  render();
+}
+document.addEventListener("focusout", () => {
+  setTimeout(() => { if (renderPending) { renderPending = false; scheduleRender(); } }, 0);
+});
+
+function render(){
+  const activeId = document.activeElement && document.activeElement.id;
+  renderHero();
+  renderLikes();
+  renderFilters();
+  renderLists();
+  if (activeId) { const f = document.getElementById(activeId); if (f) f.focus({preventScroll:true}); }
+  justStamped = null;
+}
+
+function renderHero(){
+  const done = ACTIVITIES.filter(a => state(a.id).status === "done").length;
+  document.getElementById("tally-num").textContent = done;
+  document.getElementById("tally-total").textContent = ACTIVITIES.length;
+  const grid = document.getElementById("stampgrid");
+  grid.setAttribute("aria-label", done + " of " + ACTIVITIES.length + " activities tried");
+  grid.replaceChildren(...ACTIVITIES.map(a => {
+    const s = state(a.id).status;
+    return el("span", {class: "dot t-" + a.type + (s === "done" ? " is-done" : s === "next" ? " is-next" : ""), title: a.title + (s === "done" ? " (tried)" : s === "next" ? " (up next)" : "")});
+  }));
+}
+
+function starsText(avg){
+  const full = Math.round(avg);
+  return "★".repeat(full) + "☆".repeat(5 - full);
+}
+
+function renderLikes(){
+  const box = document.getElementById("likes-body");
+  const rated = ACTIVITIES.filter(a => state(a.id).status === "done" && state(a.id).rating > 0);
+  const rows = TYPES.map(t => {
+    const all = ACTIVITIES.filter(a => a.type === t);
+    const tried = all.filter(a => state(a.id).status === "done");
+    const r = tried.filter(a => state(a.id).rating > 0);
+    const avg = r.length ? r.reduce((s, a) => s + state(a.id).rating, 0) / r.length : 0;
+    return {t, total: all.length, tried: tried.length, rated: r.length, avg};
+  });
+  const kids = [];
+  if (rated.length) {
+    const best = rows.filter(r => r.rated).sort((a, b) => b.avg - a.avg || b.rated - a.rated)[0];
+    kids.push(el("p", {class: "fav"}, "Favourite type so far: ", el("strong", {text: best.t}), " (" + best.avg.toFixed(1) + " stars on average, " + best.rated + " rated)"));
+  } else {
+    kids.push(el("p", {class: "hint", text: "Rate the activities he's tried, and his favourite type will show up here."}));
+  }
+  kids.push(el("div", {class: "typerows"}, rows.map(r =>
+    el("div", {class: "typerow"},
+      el("span", {class: "name", text: r.t}),
+      el("div", {class: "track", role: "img", "aria-label": r.tried + " of " + r.total + " " + r.t + " activities tried"},
+        el("div", {class: "fill", style: "width:" + (r.total ? (r.tried / r.total * 100) : 0) + "%;background:var(--" + r.t.toLowerCase() + ")"})),
+      el("span", {class: "stat", text: r.tried + "/" + r.total + (r.rated ? " · " + r.avg.toFixed(1) + "★" : "")})
+    )
+  )));
+  if (rated.length) {
+    const top = rated.slice().sort((a, b) => state(b.id).rating - state(a.id).rating || (state(b.id).doneOn > state(a.id).doneOn ? 1 : -1)).slice(0, 3);
+    kids.push(el("div", {class: "toprated"},
+      el("span", {class: "label", text: "Top rated"}),
+      el("ol", null, top.map(a => el("li", null, el("span", {text: a.title}), el("span", {class: "s", "aria-label": state(a.id).rating + " out of 5 stars", text: starsText(state(a.id).rating)}))))
+    ));
+  }
+  box.replaceChildren(...kids);
+}
+
+function renderFilters(){
+  const nav = document.getElementById("filters");
+  const opts = ["All", ...TYPES];
+  nav.replaceChildren(...opts.map(t => {
+    const n = t === "All" ? ACTIVITIES.length : ACTIVITIES.filter(a => a.type === t).length;
+    return el("button", {type: "button", class: "chip", id: "filter-" + t.toLowerCase(), "aria-pressed": String(filter === t), onclick: () => { filter = t; render(); }},
+      t, el("span", {class: "n", text: String(n)}));
+  }));
+}
+
+function renderLists(){
+  const visible = ACTIVITIES.filter(a => filter === "All" || a.type === filter);
+  const next = visible.filter(a => state(a.id).status === "next");
+  const todo = visible.filter(a => state(a.id).status === "todo");
+  const done = visible.filter(a => state(a.id).status === "done")
+    .sort((a, b) => (state(b.id).doneOn || "").localeCompare(state(a.id).doneOn || "") || a.title.localeCompare(b.title));
+
+  fillList("next", next, "Nothing planned yet. Tap “Make it next” on anything below.");
+  fillList("todo", todo, filter === "All" ? "He's tried everything on the list. Time to add more!" : "Nothing left to try in this type.");
+  fillList("done", done, "No stamps yet. Tick an activity once he's tried it.");
+}
+function fillList(key, items, emptyText){
+  document.getElementById("c-" + key).textContent = items.length ? String(items.length) : "";
+  const list = document.getElementById("list-" + key);
+  list.replaceChildren(...(items.length ? items.map(card) : [el("p", {class: "empty", text: emptyText})]));
+}
+
+function card(a){
+  const s = state(a.id);
+  const done = s.status === "done";
+  const isNext = s.status === "next";
+  const locked = !ready;
+  const today = todayISO();
+
+  const tick = el("input", {type: "checkbox", class: "tick", id: "done-" + a.id, checked: done, disabled: locked,
+    "aria-label": (done ? "Tried: " : "Mark as tried: ") + a.title,
+    onchange: (ev) => {
+      if (ev.target.checked) { justStamped = a.id; save(a.id, {status: "done", doneOn: s.doneOn || today}); }
+      else save(a.id, {status: "todo"});
+    }});
+
+  const meta = el("div", {class: "meta"},
+    el("span", {class: "pill", text: a.type}),
+    a.area ? el("span", {class: "area", text: a.area}) : null,
+    a.when ? el("span", {class: "when" + (a.when < today && !done ? " passed" : ""),
+      text: fmtWhen(a.when) + (a.time ? " · " + a.time : "") + (a.when < today && !done ? " · date passed" : "")}) : null
+  );
+
+  const body = el("div", {class: "body"},
+    meta,
+    el("h3", {text: a.title}),
+    el("p", {class: "where", text: a.where}),
+    a.note ? el("p", {class: "note", text: a.note}) : null
+  );
+
+  if (!done) {
+    body.append(el("div", {class: "actions"},
+      el("button", {type: "button", class: "btn", id: "next-" + a.id, "aria-pressed": String(isNext), disabled: locked,
+        onclick: () => save(a.id, {status: isNext ? "todo" : "next"}),
+        text: isNext ? "Up next ✓" : "Make it next"})
+    ));
+  } else {
+    const stars = el("fieldset", {class: "stars"}, el("legend", {text: "His rating"}));
+    for (let i = 1; i <= 5; i++) {
+      const rid = "rate-" + a.id + "-" + i;
+      stars.append(
+        el("input", {type: "radio", name: "rate-" + a.id, id: rid, value: String(i), checked: s.rating === i, disabled: locked,
+          onchange: () => save(a.id, {rating: i})}),
+        el("label", {for: rid, class: i <= s.rating ? "on" : "", title: i + (i === 1 ? " star" : " stars"), text: "★"},
+          el("span", {class: "sr", text: i + (i === 1 ? " star" : " stars")}))
+      );
+    }
+    const verdict = el("input", {type: "text", id: "verdict-" + a.id, maxlength: "200", value: s.note,
+      placeholder: "Loved it, not for him, want to go again…", disabled: locked, autocomplete: "off",
+      oninput: (ev) => {
+        const v = ev.target.value;
+        progress[a.id] = {...state(a.id), note: v};
+        clearTimeout(noteTimers[a.id]);
+        noteTimers[a.id] = setTimeout(() => { noteTimers[a.id] = null; flush(a.id); }, 700);
+      },
+      onblur: () => { clearTimeout(noteTimers[a.id]); noteTimers[a.id] = null; flush(a.id); }});
+    const date = el("input", {type: "date", id: "date-" + a.id, value: s.doneOn, max: today, disabled: locked,
+      onchange: (ev) => save(a.id, {doneOn: ev.target.value})});
+    body.append(el("div", {class: "review"},
+      stars,
+      el("div", {class: "fields"},
+        el("label", {class: "field", for: "date-" + a.id}, "Tried on", date),
+        el("label", {class: "field grow", for: "verdict-" + a.id}, "His verdict", verdict)
+      )
+    ));
+  }
+
+  const cls = "card t-" + a.type + (done ? " has-stamp is-done" : "") + (isNext ? " is-next" : "");
+  const node = el("article", {class: cls, id: "card-" + a.id}, tick, body);
+  if (done) {
+    node.append(el("div", {class: "stamp" + (justStamped === a.id ? " stamp-in" : ""), "aria-hidden": "true"},
+      el("span", null, "Tried", el("br"), s.doneOn ? fmtStamp(s.doneOn) : "✓")));
+  }
+  return node;
+}
+
+/* ---------- Start ---------- */
+let loading = false;
+async function load(){
+  if (loading) return;
+  loading = true;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 10000);
+  try {
+    const res = await fetch(API + "?select=id,status,rating,note,done_on", {headers: HEADERS, signal: ctrl.signal, cache: "no-store"});
+    if (!res.ok) throw new Error("Load failed: " + res.status);
+    const rows = await res.json();
+    const incoming = {};
+    for (const r of rows) {
+      if (r && BY_ID[r.id]) incoming[r.id] = clean({status: r.status, rating: r.rating, note: r.note, doneOn: r.done_on || ""});
+    }
+    for (const id of Object.keys(progress)) {
+      if ((writing[id] || dirty[id] || noteTimers[id]) && progress[id]) incoming[id] = progress[id];
+    }
+    progress = incoming;
+    ready = true;
+    if (!Object.values(writing).some(Boolean)) setSync("ok");
+    scheduleRender();
+  } catch (e) {
+    setSync(ready ? "error" : "slow");
+  } finally {
+    clearTimeout(timer);
+    loading = false;
+  }
+}
+
+render();
+if (SUPABASE_URL.startsWith("__") || SUPABASE_KEY.startsWith("__")) {
+  setSync("nodb");
+} else {
+  setSync("loading");
+  load();
+  setInterval(() => { if (document.visibilityState === "visible") load(); }, 30000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(); });
+}
+</script>
+</body>
+</html>
